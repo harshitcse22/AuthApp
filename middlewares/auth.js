@@ -7,9 +7,13 @@ exports.auth = (req, res, next) =>{
     try{
        //extract JWT token
        // pending: other ways to fetch tokens
-       const token  = req.body.token;
+       console.log("cookie", req.cookies.token);
+       console.log("body", req.body.token);
+       console.log("header", req.header("Authorization"));
 
-       if(!token){
+       const token  = req.body.token || req.body.token || req.header("Authorization").replace("Bearer","");
+
+       if(!token || token === undefined){
           return res.status(400).json({
             success:true,
             message:"Token missing",
@@ -20,7 +24,7 @@ exports.auth = (req, res, next) =>{
        try{
         const payload = jwt.verify(token,process.env.JWT_SECRET);
         console.log(payload);
-
+        //why this?
         req.user = payload;
        }catch(error){
          return res.status(401).json({
